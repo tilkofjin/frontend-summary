@@ -1,0 +1,24 @@
+{
+  "name": "frontend-summary",
+  "version": "1.0.0",
+  "description": "front-end summary",
+  "main": "index.js",
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs",
+    "deploy":"deploy.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tilkofjin/frontend-summary.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tilkofjin/frontend-summary/issues"
+  },
+  "homepage": "https://github.com/tilkofjin/frontend-summary#readme",
+  "devDependencies": {
+    "vuepress": "^1.5.2"
+  }
+}
