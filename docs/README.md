@@ -1,14 +1,14 @@
 ---
 home: true
 heroImage: /img/homeImg.jpg
-heroText: 前端自学指南
-tagline: 前端学习的心路历程
-actionText: 快速上手 →
+heroText: Front-end self-study guide
+tagline: The journey of front-end learning
+actionText: Get started quickly →
 actionLink: /basics/
 features:
-- title: 简洁至上
-  details: 以 Markdown 为中心的项目结构，以最少的配置帮助你专注于写作。
-- title: 自律自省
-  details: 对任何语言完善的相关知识体系都很重要，勤而好学、不耻下问、自强不息！
+- title: Keep it simple
+  details: Markdown-centric project structure helps you focus on writing with minimal configuration。
+- title: Self-discipline
+  details: It is important for any language-related knowledge system to be diligent and studious, ask no shame, and keep improving!
 footer: MIT Licensed | Copyright © 2020-present Tilkofjin
 ---
