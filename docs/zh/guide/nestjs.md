@@ -5,7 +5,7 @@ lang: zh-CN
 
 # Nestjs 开发指南
 
-> 框架介绍
+* 框架介绍
 
 > Nest是目前为止个人认为最优秀的渐进式<a href="http://nodejs.org" target="_blank">Node.js</a> 企业级框架，使用 <a href="http://www.typescriptlang.org" target="_blank">TypeScript</a>构建并保证了与原生JS的兼容性，并结合了 OOP（面向对象编程），FP（函数式编程）和 FRP（函数式响应编程）的元素，有点类似 JAVA 的 sprinboot 框架的核型思想。是目前前端工程师构建大型全栈项目的最好选择。
 
@@ -18,7 +18,6 @@ lang: zh-CN
   $ npm i -g @nestjs/cli
   $ nest new project-name
 ```
-> nest 核心模块，controller、model、service 各种功能顾名思义
 
 ## 控制器
 ![img](https://docs.nestjs.com/assets/Controllers_1.png "控制器")
@@ -40,7 +39,7 @@ export class CatsController {
 ```
 通过例子可以看出，使用Controller装饰器，可以很方便的写一个cats的控制器模块，一个简单的Get请求也可以通过装饰器轻松实现。全局安装过 `nest cli` 后，创建一个控制器也变得非常容易
 ::: tip 创建cats控制器
-  ` $ nest g controller cats `
+    $ nest g controller cats
 :::
 使用时请按照官方推荐的方式，这样能避免走很多弯路。
 ### 请求对象（request）
@@ -70,7 +69,7 @@ export class CatsController {
 为了与底层 `HTTP`平台(如 `Express`和 `Fastify`)之间的类型兼容，`Nest` 提供了 `@Res()`和 `@Response()` 装饰器。`@Res()`只是 `@Response()`的别名。两者都直接公开底层响应对象接口。在使用它们时您还应该导入底层库的类型(例如：`@types/express`)以充分利用它们。注意，在方法处理程序中注入 `@Res()`或 `@Response()` 时，将 `Nest`置于该处理程序的特定于库的模式中，并负责管理响应。这样做时，必须通过调用响应对象(例如，`res.json(…)`或 `res.send(…)`)发出某种响应，否则HTTP服务器将挂起。
 
 ### 资源
-::: tip 继续沿用官方的例子
+::: tip 官方的例子
     cats.controller.ts
 :::
   ```typescript
@@ -149,7 +148,6 @@ getDocs(@Query('version') version) {
 ```
 ### 路由参数
 当需要接受動態數據作為請求的一部分時，帶有靜態路徑的路由將不起作用（例：使用`GET`请求 `/cats/1` 来获取 id为 1的 `cat`），为了定义带参数的路由，我们可以在路由中添加路由参数**标记**,来获取请求URL中该位置的动态值。`@Get` 下面的装饰器示例中的路由参数标记演示了此方法。可以使用 `@Param()` 裝飾器訪問以這種方式声明的路由参数，该装饰器应添加到函数签名中。
-> 官方的例子
 ```typescript
 @Get(':id')
 findOne(@Param() params): string {
@@ -221,7 +219,7 @@ findAll(): Observable<any[]> {
 首先要确定 `DTO(数据传输对象)` 模式。`DTO` 是一个对象，它定义了如何通过网络发送数据。我们可以通过使用 `TypeScript` 接口或简单的类来完成。由于 `TypeScript` 接口在转换过程中被删除，所以 `Nest` 不能在运行时引用它们。因為管道等功能在運行時可以訪問變量的元類型時,提供了更多的可能性。
 > 我们来创建一个 `CreateCatDto` 类
 ::: tip 官方的例子
-  create-cat.dto.ts
+    create-cat.dto.ts
 :::
 ```typescript
 export class CreateCatDto {
