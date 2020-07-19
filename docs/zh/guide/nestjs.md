@@ -298,6 +298,7 @@ import { CatsController } from './cats/cats.controller';
 export class AppModule {}
 ```
 使用 `@Module()` 裝飾器將元數據附加到项目的模塊類中，`Nest` 现在可以輕鬆反映必須安裝哪些控制器。
+
 ---
 ### 附录：类库的特有方式
 以上主要讲述是nest标准的方法处理的响应方式，这里简单讲述，还以上述的 `CatsController` 为例重寫為以下內容：
