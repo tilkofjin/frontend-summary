@@ -23,7 +23,7 @@ lang: zh-CN
 ![img](https://docs.nestjs.com/assets/Controllers_1.png "控制器")
 > 负责处理传入的 **请求** 和向客户端返回 **响应** ，通熟点我理解为，全局请求、响应路由控制，通过TS的装饰器可以很方便的将类与数据进行关联，并使nest创建路由映射将数据绑定到相应的控制器。
 ### 路由
-  ::: tip 官方的例子:
+  ::: tip 官方示例:
     cats.controller.ts
   :::
 ```typescript
@@ -69,7 +69,7 @@ export class CatsController {
 为了与底层 `HTTP`平台(如 `Express`和 `Fastify`)之间的类型兼容，`Nest` 提供了 `@Res()`和 `@Response()` 装饰器。`@Res()`只是 `@Response()`的别名。两者都直接公开底层响应对象接口。在使用它们时您还应该导入底层库的类型(例如：`@types/express`)以充分利用它们。注意，在方法处理程序中注入 `@Res()`或 `@Response()` 时，将 `Nest`置于该处理程序的特定于库的模式中，并负责管理响应。这样做时，必须通过调用响应对象(例如，`res.json(…)`或 `res.send(…)`)发出某种响应，否则HTTP服务器将挂起。
 
 ### 资源
-::: tip 官方的例子
+::: tip 官方示例
     cats.controller.ts
 :::
   ```typescript
@@ -193,7 +193,7 @@ export class AccountController {
 
 ### 异步（async / await）
 由于请求大多都是异步的，异步编程带来的好处不必多说
-::: tip 官方的例子
+::: tip 官方示例
     cats.controller.ts
 :::
 ```typescript
@@ -203,7 +203,7 @@ async findAll(): Promise<any[]> {
 }
 ```
 除上面的演示外，通过返回 RxJS [observable流](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html) 使nest路由处理更强大。在流完成后，nest将自动订阅下面的源并获取最后发出的值。
-::: tip 官方的例子
+::: tip 官方示例
     cats.controller.ts
 :::
 ```typescript
@@ -218,7 +218,7 @@ findAll(): Observable<any[]> {
 之前的 `POST` 路由处理程序不接受任何客户端参数。在这里添加 `@Body()` 参数来解决这个问题。
 首先要确定 `DTO(数据传输对象)` 模式。`DTO` 是一个对象，它定义了如何通过网络发送数据。我们可以通过使用 `TypeScript` 接口或简单的类来完成。由于 `TypeScript` 接口在转换过程中被删除，所以 `Nest` 不能在运行时引用它们。因為管道等功能在運行時可以訪問變量的元類型時,提供了更多的可能性。
 > 我们来创建一个 `CreateCatDto` 类
-::: tip 官方的例子
+::: tip 官方示例
     create-cat.dto.ts
 :::
 ```typescript
@@ -229,7 +229,7 @@ export class CreateCatDto {
 }
 ```
 上例中的类只有三个属性，此後，我們可以在 `CatsController` 中使用新創建的 `DTO`：
-::: tip 官方的例子
+::: tip 官方示例
     cats.controller.ts
 :::
 ```typescript
@@ -243,7 +243,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 ### 完整示例
 下面是使用几个装饰器创建的控制器的示例，该示例展示了控制器提供的几种访问和操作内部数据的方法。
-::: tip 官方的例子
+::: tip 官方示例
     cats.controller.ts
 :::
 ```typescript
@@ -283,7 +283,7 @@ export class CatsController {
 ### 开始运行
 完成上述控制器的定义后，`Nest` 仍然不知道 `CatsController` 存在。
 因此不會創建此類的實例,控制器始終屬於模塊，这就是为什么将 `controllers` 数组保存在 `@module()` 装饰器中, 由于除了根 `ApplicationModule`，我们没有其他模块，所以将使用它来介绍 `CatsController`:
-::: tip 官方的例子
+::: tip 官方示例
     app.module.ts
 :::
 ```typescript
@@ -319,3 +319,73 @@ export class CatsController {
 ```
 * 这里只做简单官方引述，类库的特有方式从官方的示例可已看出，逻辑并不清晰，因此建议在任何时候都采用nest的标准模式。
 以上是 `nest` 关于控制器的基础介绍。 
+
+## 提供者
+![img](https://docs.nestjs.com/assets/Components_1.png "提供者")
+控制器应处理 `HTTP` 请求并将更复杂的任务委托给 `Providers`。`Providers` 只是一个用 `@Injectable()` 装饰器注释的类，是纯粹的 `JavaScript` 类。
+::: tip 强烈建议
+  由于 `Nest` 可以以更多的面向对象方式设计和组织依赖性,因此请按照官方建议，强烈推荐按照[SOLID(单一功能、开闭原则、里氏替换、接口隔离以及依赖反转)](https://zh.wikipedia.org/wiki/SOLID_(%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1))原则。
+:::
+
+### 服务
+创建一个简单的服务示例，该服务将负责数据存储和检索，由其使用 `CatsController`，因此它被定义为 `Provider` ，我们用这个类来装饰 `@Injectable()`。
+::: tip 官方示例
+    cats.service.ts
+:::
+```typescript
+import { Injectable } from '@nestjs/common';
+import { Cat } from './interfaces/cat.interface';
+
+@Injectable()
+export class CatsService {
+  private readonly cats: Cat[] = [];
+
+  create(cat: Cat) {
+    this.cats.push(cat);
+  }
+
+  findAll(): Cat[] {
+    return this.cats;
+  }
+}
+```
+::: tip 提示
+  若要使用 `CLI` 创建服务类，只需输入命令 `$ nest g service cats`。
+:::
+`CatsService` 是具有一个属性和两个方法的基本类。唯一的新特点是它使用 `@Injectable()` 装饰器。该 `@Injectable()` 附加有元数据，因此 Nest 知道这个类是一个 `Nest Provider`。
+::: tip 提示
+  示例中的 `Cat` 接口如下
+:::
+```typescript
+export interface Cat {
+  name: string;
+  age: number;
+  breed: string;
+}
+```
+我们现在有了一个服务类来检索 `cats`,在 `CatsController` 里使用如下
+::: tip 提示
+    cats.controller.ts
+:::
+```typescript
+import { Controller, Get, Post, Body } from '@nestjs/common';
+import { CreateCatDto } from './dto/create-cat.dto';
+import { CatsService } from './cats.service';
+import { Cat } from './interfaces/cat.interface';
+
+@Controller('cats')
+export class CatsController {
+  constructor(private catsService: CatsService) {}
+
+  @Post()
+  async create(@Body() createCatDto: CreateCatDto) {
+    this.catsService.create(createCatDto);
+  }
+
+  @Get()
+  async findAll(): Promise<Cat[]> {
+    return this.catsService.findAll();
+  }
+}
+```
+通过类构造函数注入 `CatsService`, 注意这里的 `private` 语法，意味着我们已经在同一位置创建并初始化了 `catsService` 成员。
