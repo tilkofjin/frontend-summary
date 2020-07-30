@@ -420,3 +420,59 @@ export class HttpService<T> {
 }
 ```
 上面的示例中我们使用了自定的 `provider` ,这是我们包含自定义 `HTTP_OPTIONS` **token**的原因，前面的示例显示了基于构造函数的注入，该注入通过依赖函数的类进行依赖，更多的自定义 `Providers` 和相关 **tokens**信息 [:books:](https://docs.nestjs.com/fundamentals/custom-providers)
+
+### 基于属性的注入
+`Nest` 到目前为止使用基于构造函数注入的技术，即通过构造函数的方法注入 `providers` ,在一些特殊的场景，基于属性的注入方式变得更好用。例如，如果顶级类依赖与一个或多个 `providers`,通过从构造函数中调用子类的 `super()` 来传递它们就显得非常繁琐，为了避免这种情况，可以在属性上使用 `@Inject()` 装饰器。示例如下：
+```typescript
+import { Injectable, Inject } from '@nestjs/common';
+
+@Injectable()
+export class HttpService<T> {
+  @Inject('HTTP_OPTIONS')
+  private readonly httpClient: T;
+}
+```
+::: warning 
+如果你的类没有其他 `provider` 扩展，那你应该一直使用**基于构造函数**的注入方式。
+:::
+
+### 注册 Provider
+现在我们已经有了一个自定义的提供者`(CatsService)`,同时我们有这个服务的使用者 `(CatsController)`,我们需要向 `Nest` 注册该服务，已便能执行注入，我们可以编辑模块文件 `(app.module.ts)` , 然后将服务添加至 `@Module()` 装饰器的 `providers` 数组中。
+
+::: tip 官方示例
+    app.module.ts
+:::
+```typescript
+import { Module } from '@nestjs/common';
+import { CatsController } from './cats/cats.controller';
+import { CatsService } from './cats/cats.service';
+
+@Module({
+  controllers: [CatsController],
+  providers: [CatsService],
+})
+export class AppModule {}
+```
+`Nest` 现在可以解析 `CatsController` 类的依赖关系了。以下是现在的目录结构:
+```src
+    ├── cats
+    │    ├──dto
+    │    │   └──create-cat.dto.ts
+    │    ├── interfaces
+    │    │       └──cat.interface.ts
+    │    ├──cats.service.ts
+    │    └──cats.controller.ts
+    ├──app.module.ts
+    └──main.ts
+```
+
+### 手动实例化
+迄今，已近讨论了 `Nest` 是如何自动处理并解析依赖项的大部分细节。在某些情况下，可能需要跳出内置的依赖注入系统，并手动检索或实例化提供程序，我们在下面简要讨论两个这样的主题。
+
+要获取现有实例或动态的实例提供程序，可以使用 [`Module reference`](https://docs.nestjs.com/fundamentals/module-ref)。
+
+在 `bootstrap()` 函数中获取提供程序(例如，对于没有控制器的独立应用程序,或在引导过程中使用配置服务),请查看[`Standalone applications`](https://docs.nestjs.com/standalone-applications)。
+
+
+## 模块
+
