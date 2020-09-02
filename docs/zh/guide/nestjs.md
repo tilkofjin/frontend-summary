@@ -659,7 +659,7 @@ export class DatabaseModule {
 ```
 
 ::: tip
-    `forRoot()` 方法可以同步或异步( `Promise` )返回动态模块
+  `forRoot()` 方法可以同步或异步( `Promise` )返回动态模块
 :::
 
 模块默认定义了 `Connection` 提供程序(在 `@Module()` 装饰器元数据中)，此外-根据传递给方法的 `entities` 和 `options` 对象 `forRoot()` -公开提供程序的集合，例如存储库。请注意，动态模块返回的是属性扩展而不是覆盖，`@Module()` 装饰器中定义的基本模块元数据。这就是从模块中导出静态声明的 `Connection` 提供程序和动态生成的存储库提供程序的方式。
@@ -746,3 +746,185 @@ export class LoggerMiddleware implements NestMiddleware {
 ```
 
 ### 依赖注入
+
+Nest中间件全面支持依赖注入，就像 `providers` 和 `controllers` 一样，他们能够注入同一模块中可用的依赖项，和平常一样，这是通过构造函数完成的。
+
+### 应用中间件
+
+`@Module()` 装饰器中不可放入中间件, 相反，我们使用模块类的 `configure()` 方法来设置它们。包含中间件的模块必须实现 `NestModule` 接口，我们在  `AppModule` 级别上设置 `LoggerMiddleware`。
+::: tip 官方示例
+    app.module.ts
+:::
+```typescript
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { CatsModule } from './cats/cats.module';
+
+@Module({
+  imports: [CatsModule],
+})
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes('cats');
+  }
+}
+```
+在上面的示例中，我们为先前在 `CatsController` 内部定义的 `/ cats` 路由处理程序设置了 `LoggerMiddleware`，在配置中间件时，我们还可以通过将包含路由路径和请求方法的对象，传递给 `forRoutes()` 方法，进一步将中间件限制为特定的请求方法。在下面的示例中，请注意，我们导入了 `RequestMethod` 枚举以引用所需的请求方法类型。
+
+::: tip 官方示例
+    app.module.ts
+:::
+
+```typescript
+import { Module, NestModule, RequestMethod, MiddlewareConsumer } from '@nestjs/common';
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { CatsModule } from './cats/cats.module';
+
+@Module({
+  imports: [CatsModule],
+})
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes({ path: 'cats', method: RequestMethod.GET });
+  }
+}
+```
+
+::: tip
+  可以使用 `async / await` 使 `configure()` 方法异步化（例，可以在 `configure()` 方法主体中，等待异步操作的完成）。
+:::
+
+### 路由通配符
+
+路由同样支持模式匹配，例如，可以使用 * 通配符，匹配任何字符组合。
+
+```typescript
+  forRoutes({ path: 'ab*cd', method: RequestMethod.ALL });
+```
+
+路由路径为`'ab * cd'`，将匹配abcd，ab_cd，abecd等等，字符 `?，+，* 及 ()` 是它们的正则表达式对应项的子集。连字符 (`-`) 和点 (`.`) 按字符串路径解析。
+
+::: warning
+  fastify软件包使用最新版本的path-to-regexp软件包，该软件包不再支持通配符星号*。 相反，您必须使用参数 (例如 (`.*`)、`:splat*`)。
+:::
+
+### 中间件消费者
+
+`MiddlewareConsumer` 是个帮助类。它提供了几种内置方法来管理中间件，他们都可以被简单地链接起来。`forRoutes()` 方法可以使用单个字符串，多个字符串，`RouteInfo` 对象，一个控制器类甚至多个控制器类。在大多数情况下，您可能只需要传递以逗号分隔的控制器列表。以下是单个控制器的示例：
+
+::: tip 官方示例
+    app.module.ts
+:::
+
+```typescript
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { CatsModule } from './cats/cats.module';
+import { CatsController } from './cats/cats.controller.ts';
+
+@Module({
+  imports: [CatsModule],
+})
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes(CatsController);
+  }
+}
+```
+::: tip
+  `apply()` 方法可以采用单个中间件，也可以使用多个参数来指定多个中间件。
+:::
+
+### 排除路由
+
+有时我们想从应用中间件中排除某些路由，我们可以使用 `exclude()` 方法轻松排除某些路由，此方法可以采用一个字符串，多个字符串或一个 `RouteInfo` 对象，以标识要排除的路由，如下所示：
+
+```typescript
+consumer
+  .apply(LoggerMiddleware)
+  .exclude(
+    { path: 'cats', method: RequestMethod.GET },
+    { path: 'cats', method: RequestMethod.POST },
+    'cats/(.*)',
+  )
+  .forRoutes(CatsController);
+```
+::: tip
+  `exclude()` 方法使用 `path-to-regexp` 包支持通配符参数。
+:::
+
+在上面的示例中，`LoggerMiddleware` 将绑定到 `CatsController` 内部定义的所有路由，但传递给 `exclude()` 方法的三个路由除外。
+
+### 函数式中间件
+
+我们一直在使用的 `LoggerMiddleware` 类非常简单，它没有成员，没有其他方法，也没有依赖项。为什么我们不能定义一个简单的函数，而要定义一个类。事实上，我们可以，这种类型的中间件称为 **函数中间件**，让我们将 `logger 中间件` 从基于 **类的中间件** 转变为 **函数式中间件**来说明他们的区别。
+
+::: tip 官方示例
+    logger.middleware.ts
+:::
+
+```typescript
+import { Request, Response } from 'express';
+
+export function logger(req: Request, res: Response, next: Function) {
+  console.log(`Request...`);
+  next();
+};
+```
+并在 `AppModule` 中使用它
+
+::: tip 官方示例
+    app.module.ts
+:::
+
+```typescript
+  consumer
+  .apply(logger)
+  .forRoutes(CatsController);
+```
+
+::: tip
+    每当您的中间件不需要任何依赖关系时，请考虑使用功能更简单的中间件替代方案。
+:::
+
+### 多个中间件
+
+如上所述，为了绑定顺序执行的多个中间件，只需在 `apply()` 方法内部使用**逗号**分隔的列表即可。
+
+```typescript
+consumer.apply(cors(), helmet(), logger).forRoutes(CatsController);
+```
+
+### 全局中间件
+
+如果我们想一次性将中间件绑定到每个注册的路由，我们可以使用 `INestApplication` 实例提供的 `use()` 方法：
+
+```typescript
+const app = await NestFactory.create(AppModule);
+app.use(logger);
+await app.listen(3000);
+```
+
+## 异常过滤器
+
+Nest带有内置的异常层，该层负责处理应用程序中所有未处理的异常。当应用程序代码未处理异常时，此层将捕获该异常，然后对用户自动发送适当的友好响应。
+
+![img](https://docs.nestjs.com/assets/Filter_1.png "异常过滤器")
+
+开箱即用，此操作由内置的全局异常过滤器执行，该过滤器处理 `HttpException` 类型的异常(及其子类)。如果无法识别异常(既不是 `HttpException` 也不是从 `HttpException` 继承的类)，则内置异常过滤器将生成以下默认JSON响应：
+
+```json
+{
+  "statusCode": 500,
+  "message": "Internal server error"
+}
+```
+
+### 引发标准异常
+
