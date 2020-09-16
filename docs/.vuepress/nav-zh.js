@@ -3,6 +3,7 @@ module.exports = [
   { text: "前端基础", link: "/zh/basics/" },
   {
     text: "进阶指南",
+    ariaLabel: '进阶指南 Menu',
     items: [
       { text: "Nodejs", link: "/zh/guide/nodejs/" },
       { text: "Nestjs", link: "/zh/guide/nestjs/introduction" },
