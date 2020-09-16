@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>动态模块 | 前端自学指南</title>
+    <meta name="generator" content="VuePress 1.5.2">
+    <link rel="icon" href="/frontend-summary/img/headLogo.jpg">
+    <meta name="description" content="前端学习的心路历程">
+    <link rel="preload" href="/frontend-summary/assets/css/0.styles.8996fafd.css" as="style"><link rel="preload" href="/frontend-summary/assets/js/app.3d59e47e.js" as="script"><link rel="preload" href="/frontend-summary/assets/js/3.332dd64b.js" as="script"><link rel="preload" href="/frontend-summary/assets/js/22.8f23807d.js" as="script"><link rel="prefetch" href="/frontend-summary/assets/js/10.cb36361a.js"><link rel="prefetch" href="/frontend-summary/assets/js/11.c6772edc.js"><link rel="prefetch" href="/frontend-summary/assets/js/12.d672fa33.js"><link rel="prefetch" href="/frontend-summary/assets/js/13.2e52daed.js"><link rel="prefetch" href="/frontend-summary/assets/js/14.b0429b8f.js"><link rel="prefetch" href="/frontend-summary/assets/js/15.0b323b6d.js"><link rel="prefetch" href="/frontend-summary/assets/js/16.81fea3b7.js"><link rel="prefetch" href="/frontend-summary/assets/js/17.4f66820a.js"><link rel="prefetch" href="/frontend-summary/assets/js/18.cf9a34d7.js"><link rel="prefetch" href="/frontend-summary/assets/js/19.f2f5cc9b.js"><link rel="prefetch" href="/frontend-summary/assets/js/20.ca795f44.js"><link rel="prefetch" href="/frontend-summary/assets/js/21.8e2a6c50.js"><link rel="prefetch" href="/frontend-summary/assets/js/23.0fea4f9e.js"><link rel="prefetch" href="/frontend-summary/assets/js/24.b0499c5f.js"><link rel="prefetch" href="/frontend-summary/assets/js/25.ae875e5c.js"><link rel="prefetch" href="/frontend-summary/assets/js/26.4ef3072e.js"><link rel="prefetch" href="/frontend-summary/assets/js/27.ce9e3582.js"><link rel="prefetch" href="/frontend-summary/assets/js/28.954dc382.js"><link rel="prefetch" href="/frontend-summary/assets/js/29.dfb74d98.js"><link rel="prefetch" href="/frontend-summary/assets/js/30.3a1fde9d.js"><link rel="prefetch" href="/frontend-summary/assets/js/31.dd7761a2.js"><link rel="prefetch" href="/frontend-summary/assets/js/32.844f56e7.js"><link rel="prefetch" href="/frontend-summary/assets/js/33.41abfd41.js"><link rel="prefetch" href="/frontend-summary/assets/js/34.7cf5b434.js"><link rel="prefetch" href="/frontend-summary/assets/js/4.40114be8.js"><link rel="prefetch" href="/frontend-summary/assets/js/5.f053a152.js"><link rel="prefetch" href="/frontend-summary/assets/js/6.bbc48170.js"><link rel="prefetch" href="/frontend-summary/assets/js/7.18824614.js"><link rel="prefetch" href="/frontend-summary/assets/js/8.4516358a.js"><link rel="prefetch" href="/frontend-summary/assets/js/9.2cd21853.js"><link rel="prefetch" href="/frontend-summary/assets/js/vendors~docsearch.f5584d80.js">
+    <link rel="stylesheet" href="/frontend-summary/assets/css/0.styles.8996fafd.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/frontend-summary/zh/" class="home-link router-link-active"><img src="/frontend-summary/img/searchLogo.jpg" alt="前端自学指南" class="logo"> <span class="site-name can-hide">前端自学指南</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><a href="/frontend-summary/zh/" class="nav-link">
+  首页
+</a></div><div class="nav-item"><a href="/frontend-summary/zh/basics/" class="nav-link">
+  前端基础
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="进阶指南 Menu" class="dropdown-title"><span class="title">进阶指南</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/frontend-summary/zh/guide/nodejs/" class="nav-link">
+  Nodejs
+</a></li><li class="dropdown-item"><!----> <a href="/frontend-summary/zh/guide/nestjs/introduction.html" class="nav-link">
+  Nestjs
+</a></li><li class="dropdown-item"><!----> <a href="/frontend-summary/zh/guide/ci/" class="nav-link">
+  Ci
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/tilkofjin" target="_self" rel="" class="nav-link external">
+  Github
+  <!----></a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Select language" class="dropdown-title"><span class="title">选择语言</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/frontend-summary/" class="nav-link">
+  English
+</a></li><li class="dropdown-item"><!----> <a href="/frontend-summary/zh/guide/nestjs/fundamentals/dynamicModules.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+  简体中文
+</a></li></ul></div></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/frontend-summary/zh/" class="nav-link">
+  首页
+</a></div><div class="nav-item"><a href="/frontend-summary/zh/basics/" class="nav-link">
+  前端基础
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="进阶指南 Menu" class="dropdown-title"><span class="title">进阶指南</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/frontend-summary/zh/guide/nodejs/" class="nav-link">
+  Nodejs
+</a></li><li class="dropdown-item"><!----> <a href="/frontend-summary/zh/guide/nestjs/introduction.html" class="nav-link">
+  Nestjs
+</a></li><li class="dropdown-item"><!----> <a href="/frontend-summary/zh/guide/ci/" class="nav-link">
+  Ci
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/tilkofjin" target="_self" rel="" class="nav-link external">
+  Github
+  <!----></a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Select language" class="dropdown-title"><span class="title">选择语言</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/frontend-summary/" class="nav-link">
+  English
+</a></li><li class="dropdown-item"><!----> <a href="/frontend-summary/zh/guide/nestjs/fundamentals/dynamicModules.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+  简体中文
+</a></li></ul></div></div> <!----></nav>  <ul class="sidebar-links"><li><a href="/frontend-summary/zh/guide/nodejs.html" class="sidebar-link">Nodejs</a></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading open"><span>Nestjs</span> <span class="arrow down"></span></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/frontend-summary/zh/guide/nestjs/introduction.html" class="sidebar-link">介绍</a></li><li><section class="sidebar-group collapsable is-sub-group depth-1"><p class="sidebar-heading"><span>概览</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group collapsable is-sub-group depth-1"><p class="sidebar-heading open"><span>基本原理</span> <span class="arrow down"></span></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/frontend-summary/zh/guide/nestjs/fundamentals/customProviders.html" class="sidebar-link">自定义提供者</a></li><li><a href="/frontend-summary/zh/guide/nestjs/fundamentals/asyncProviders.html" class="sidebar-link">异步提供者</a></li><li><a href="/frontend-summary/zh/guide/nestjs/fundamentals/dynamicModules.html" aria-current="page" class="active sidebar-link">动态模块</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/frontend-summary/zh/guide/nestjs/fundamentals/dynamicModules.html#动态模块" class="sidebar-link">动态模块</a></li><li class="sidebar-sub-header"><a href="/frontend-summary/zh/guide/nestjs/fundamentals/dynamicModules.html#介绍" class="sidebar-link">介绍</a></li><li class="sidebar-sub-header"><a href="/frontend-summary/zh/guide/nestjs/fundamentals/dynamicModules.html#动态模块用例" class="sidebar-link">动态模块用例</a></li></ul></li></ul></section></li></ul></section></li><li><a href="/frontend-summary/zh/guide/ci.html" class="sidebar-link">CI</a></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h2 id="动态模块"><a href="#动态模块" class="header-anchor">#</a> 动态模块</h2> <p>&quot;<a href="https://docs.nestjs.com/modules" target="_blank" rel="noopener noreferrer"><font color="red">模塊</font><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a>&quot;一章介紹了 <code>Nest</code> 模塊的基礎知識，並簡要介紹了<a href="https://docs.nestjs.com/modules#dynamic-modules" target="_blank" rel="noopener noreferrer"><font color="red">動態模塊</font><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a>。本章擴展了動態模塊的主題。完成後，您應該對它們是什麼以及如何以及何時使用它們有很好的了解。</p> <h2 id="介绍"><a href="#介绍" class="header-anchor">#</a> 介绍</h2> <p>文档&quot;概述&quot;部分中的大多数应用程序代码示例都使用常规或静态模块。模块定义了组件组，例如提供者和控制器，它们作为整体应用程序的模块化部分组合在一起。它们为这些组件提供了执行上下文或作用域。例如，模塊中定義的提供者對模塊的其他成員可見，而無需導出它們。當提供者需要在模塊外部可見時，它首先從其主機模塊中導出，然後導入到其使用模塊中。</p> <p>讓我們來看一個熟悉的例子。</p> <p>首先，我們將定義一個 <code>UsersModule</code> 以提供和導出 <code>UsersService</code>。<code>UsersModule</code> 是 <code>UsersService</code> 的宿主模塊。</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token keyword">import</span> <span class="token punctuation">{</span> Module <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@nestjs/common'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> UsersService <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./users.service'</span><span class="token punctuation">;</span>
+
+@<span class="token function">Module</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  providers<span class="token operator">:</span> <span class="token punctuation">[</span>UsersService<span class="token punctuation">]</span><span class="token punctuation">,</span>
+  exports<span class="token operator">:</span> <span class="token punctuation">[</span>UsersService<span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">UsersModule</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+</code></pre></div><p>接下來，我們將定義一個 <code>AuthModule</code>，它導入 <code>UsersModule</code>，從而使 <code>AuthModule</code> 中可以使用 <code>UsersModule</code> 的導出提供程序：</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token keyword">import</span> <span class="token punctuation">{</span> Module <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@nestjs/common'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> AuthService <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./auth.service'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> UsersModule <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'../users/users.module'</span><span class="token punctuation">;</span>
+
+@<span class="token function">Module</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  imports<span class="token operator">:</span> <span class="token punctuation">[</span>UsersModule<span class="token punctuation">]</span><span class="token punctuation">,</span>
+  providers<span class="token operator">:</span> <span class="token punctuation">[</span>AuthService<span class="token punctuation">]</span><span class="token punctuation">,</span>
+  exports<span class="token operator">:</span> <span class="token punctuation">[</span>AuthService<span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">AuthModule</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+</code></pre></div><p>這些構造使我們可以將 <code>UsersService</code> 注入到例如 <code>AuthModule</code> 中託管的 <code>AuthService中</code>：</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token keyword">import</span> <span class="token punctuation">{</span> Injectable <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@nestjs/common'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> UsersService <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'../users/users.service'</span><span class="token punctuation">;</span>
+
+@<span class="token function">Injectable</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">AuthService</span> <span class="token punctuation">{</span>
+  <span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token parameter"><span class="token keyword">private</span> usersService<span class="token operator">:</span> UsersService</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+  <span class="token comment">/*
+    Implementation that makes use of this.usersService
+  */</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>我们将其称为静态模块绑定。<code>Nest</code> 已在主机和使用模块中声明了将模块连接在一起所需的所有信息。让我们解压缩此过程中发生的事情。<code>Nest</code> 通过以下方式使 <code>AuthModule</code> 中的 <code>UsersService</code> 可用：
+1、实例化 <code>UsersModule</code>，包括可转换地导入 <code>UsersModule</code> 本身使用的其他模块，以及可转换地解决任何依赖关系(请参阅自定义提供者)
+2、實例化 <code>AuthModule</code>，並使 <code>UsersModule</code> 的導出提供者可用於 <code>AuthModule</code> 中的組件(就像它們已在 <code>AuthModule</code> 中聲明一樣)。
+3、在 <code>AuthService</code> 中註入 <code>UsersService</code> 的實例。</p> <h2 id="动态模块用例"><a href="#动态模块用例" class="header-anchor">#</a> 动态模块用例</h2></div> <footer class="page-edit"><!----> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+      ←
+      <a href="/frontend-summary/zh/guide/nestjs/fundamentals/asyncProviders.html" class="prev">
+        异步提供者
+      </a></span> <span class="next"><a href="/frontend-summary/zh/guide/ci.html">
+        CI
+      </a>
+      →
+    </span></p></div> </main></div><div class="global-ui"></div></div>
+    <script src="/frontend-summary/assets/js/app.3d59e47e.js" defer></script><script src="/frontend-summary/assets/js/3.332dd64b.js" defer></script><script src="/frontend-summary/assets/js/22.8f23807d.js" defer></script>
+  </body>
+</html>
