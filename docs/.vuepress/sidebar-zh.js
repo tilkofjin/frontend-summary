@@ -27,6 +27,7 @@ module.exports = {
             ["/zh/guide/nestjs/fundamentals/customProviders", "自定义提供者"], 
             ["/zh/guide/nestjs/fundamentals/asyncProviders", "异步提供者"], 
             ["/zh/guide/nestjs/fundamentals/dynamicModules", "动态模块"], 
+            ["/zh/guide/nestjs/fundamentals/injectionScopes", "注入作用域"], 
           ],
         },
       ],
