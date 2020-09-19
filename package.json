@@ -7,6 +7,7 @@
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs",
     "deploy": "deploy.sh",
+    "commit": "cz",
     "changelog":"conventional-changelog -p angular -i CHANGELOG.md -s -r 0"
   },
   "repository": {
@@ -21,5 +22,15 @@
   "homepage": "https://github.com/tilkofjin/frontend-summary#readme",
   "devDependencies": {
     "vuepress": "^1.5.2"
+  },
+  "husky": {
+    "hooks": {
+      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true",
+    }
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   }
 }
