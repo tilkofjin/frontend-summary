@@ -29,6 +29,8 @@ module.exports = {
             ["/zh/guide/nestjs/fundamentals/dynamicModules", "动态模块"], 
             ["/zh/guide/nestjs/fundamentals/injectionScopes", "注入作用域"],
             ["/zh/guide/nestjs/fundamentals/circularDependency", "循环依赖"],
+            ["/zh/guide/nestjs/fundamentals/moduleRef", "模塊參考"],
+            ["/zh/guide/nestjs/fundamentals/executionContext", "執行上下文"],
           ],
         },
       ],

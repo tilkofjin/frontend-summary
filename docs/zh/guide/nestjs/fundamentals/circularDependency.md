@@ -58,3 +58,18 @@ export class CommonService {
 使用 `forwardRef()` 的另一種方法是重構代碼，並使用 `ModuleRef` 類在(否則)循環關係的一側檢索提供者。[这里](https://docs.nestjs.com/fundamentals/module-ref)有關 `ModuleRef` 實用程序類的更多信息。
 
 
+## 模塊前向參考
+
+為了解決模塊之間的循環依賴關係，請在模塊關聯的兩側使用相同的 `forwardRef()` 實用程序函數。例如：
+
+::: tip 官方示例
+    common.module.ts
+:::
+
+```typescript
+@Module({
+  imports: [forwardRef(() => CatsModule)],
+})
+export class CommonModule {}
+```
+
