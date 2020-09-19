@@ -55,7 +55,6 @@ export class CommonService {
 
 ## `ModuleRef` 類的替代方法
 
-
-
+使用 `forwardRef()` 的另一種方法是重構代碼，並使用 `ModuleRef` 類在(否則)循環關係的一側檢索提供者。[这里](https://docs.nestjs.com/fundamentals/module-ref)有關 `ModuleRef` 實用程序類的更多信息。
 
 
