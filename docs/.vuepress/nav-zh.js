@@ -5,7 +5,7 @@ module.exports = [
     text: "进阶指南",
     ariaLabel: '进阶指南 Menu',
     items: [
-      { text: "Nodejs", link: "/zh/guide/nodejs/" },
+      // { text: "Nodejs", link: "/zh/guide/nodejs/" },
       { text: "Nestjs", link: "/zh/guide/nestjs/introduction" },
       { text: "Ci", link: "/zh/guide/ci/" },
     ],

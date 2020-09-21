@@ -1,7 +1,7 @@
 module.exports = {
   "/zh/basics/": ["css", "js"],
   "/zh/guide/": [
-    "nodejs",
+    // "nodejs",
     {
       title: "Nestjs",
       children: [
@@ -31,6 +31,15 @@ module.exports = {
             ["/zh/guide/nestjs/fundamentals/circularDependency", "循环依赖"],
             ["/zh/guide/nestjs/fundamentals/moduleRef", "模塊參考"],
             ["/zh/guide/nestjs/fundamentals/executionContext", "執行上下文"],
+            ["/zh/guide/nestjs/fundamentals/lifecycleEvents", "生命周期事件"],
+            ["/zh/guide/nestjs/fundamentals/platformAgnosticism", "平台未知性"],
+            ["/zh/guide/nestjs/fundamentals/testing", "测试"],
+          ],
+        },
+        {
+          title: "技术",
+          children: [
+            ["/zh/guide/nestjs/techniques/authentication", "认证方式"], 
           ],
         },
       ],
