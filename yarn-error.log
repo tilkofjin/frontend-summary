@@ -1,0 +1,66 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\yarn\bin\yarn.js docs:dev
+
+PATH: 
+  C:\Python38\Scripts\;C:\Python38\;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\NetSarang\Xftp 6\;C:\Program Files (x86)\NetSarang\Xshell 6\;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64\compiler;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\Microsoft VS Code\bin;C:\Go\bin;C:\Program Files\PuTTY\;C:\Program Files\MongoDB\Server\4.2\bin;C:\Program Files (x86)\QT Lite\QTSystem;C:\ProgramData\chocolatey\bin;D:\nvm\nvm;C:\Program Files\nodejs;C:\Program Files\Git\cmd;D:\sdk\platform-tools;D:\CMake\bin;D:\Chocolatey\bin;C:\Users\Administrator\.deno\bin;C:\adt-bundle-windows-x86_64-20130522\sdk\tools;C:\adt-bundle-windows-x86_64-20130522\sdk\platform-tools;C:\Program Files (x86)\Microsoft VS Code\bin;C:\Users\Administrator\go\bin;C:\Program Files\Java\jdk1.8.0_60\bin;C:\Users\Administrator\AppData\Local\Programs\Microsoft VS Code\bin;D:\nvm\nvm;C:\Program Files\nodejs;C:\tools\mysql\current\bin;
+
+Yarn version: 
+  1.22.5
+
+Node version: 
+  14.3.0
+
+Platform: 
+  win32 x64
+
+Trace: 
+  SyntaxError: H:\frontend-summary\package.json: Unexpected token } in JSON at position 790
+      at JSON.parse (<anonymous>)
+      at D:\nvm\nvm\v14.3.0\node_modules\yarn\lib\cli.js:1625:59
+      at Generator.next (<anonymous>)
+      at step (D:\nvm\nvm\v14.3.0\node_modules\yarn\lib\cli.js:310:30)
+      at D:\nvm\nvm\v14.3.0\node_modules\yarn\lib\cli.js:321:13
+
+npm manifest: 
+  {
+    "name": "frontend-summary",
+    "version": "1.0.0",
+    "description": "front-end summary",
+    "main": "index.js",
+    "scripts": {
+      "docs:dev": "vuepress dev docs",
+      "docs:build": "vuepress build docs",
+      "deploy": "deploy.sh",
+      "commit": "cz",
+      "changelog":"conventional-changelog -p angular -i CHANGELOG.md -s -r 0"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/tilkofjin/frontend-summary.git"
+    },
+    "author": "",
+    "license": "MIT",
+    "bugs": {
+      "url": "https://github.com/tilkofjin/frontend-summary/issues"
+    },
+    "homepage": "https://github.com/tilkofjin/frontend-summary#readme",
+    "devDependencies": {
+      "vuepress": "^1.5.2"
+    },
+    "husky": {
+      "hooks": {
+        "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true",
+      }
+    },
+    "config": {
+      "commitizen": {
+        "path": "cz-conventional-changelog"
+      }
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
