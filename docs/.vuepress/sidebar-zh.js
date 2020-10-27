@@ -40,6 +40,8 @@ module.exports = {
           title: "技术",
           children: [
             ["/zh/guide/nestjs/techniques/authentication", "认证方式"], 
+            ["/zh/guide/nestjs/techniques/database", "数据库"],
+            ["/zh/guide/nestjs/techniques/mongo", "Mongo"],
           ],
         },
       ],

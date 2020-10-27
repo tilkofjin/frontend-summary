@@ -238,3 +238,532 @@ export class AuthModule {}
 
 
 ## 登陆路由
+
+有了适当的策略，我们现在可以实现准系统 `/auth /login` 路由，并应用内置的 `Guard` 来启动`passport-local` 流程。
+
+打开 `app.controller.ts` 文件，并将其内容替换为以下内容：
+
+::: tip 官方示例
+    app.controller.ts
+:::
+
+```typescript
+import { Controller, Request, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+@Controller()
+export class AppController {
+  @UseGuards(AuthGuard('local'))
+  @Post('auth/login')
+  async login(@Request() req) {
+    return req.user;
+  }
+}
+```
+
+通过 `@UseGuards(AuthGuard('local'))`，我们使用的 `AuthGuard` 在扩展 `passport-local` 策略时会自动为我们提供 `@nestjs/passport`。让我们分解一下。我们的 `Passport` 本地策略的默认名称为 `"local"`。我们在 `@UseGuards()` 装饰器中引用该名称，以将其与 `passport-local` 包提供的代码关联。如果我们的应用程序中有多个 `Passport` 策略(每个策略可能提供特定于策略的 `AuthGuard`)，则使用他的值来消除要调用的策略的歧义。到目前为止，我们只有这样一种策略，我们将很快添加，因此需要消除歧义。
+
+为了测试我们的路由，我们将使用 `/auth  /login` 路由暂时返回用户。这也使我们能够演示另一个 `Passport` 功能：`Passport` 会自动创建一个用户对象，基于我们从 `validate()` 方法返回的值，并将其作为 `req.user` 分配给 `Request` 对象。稍后，我们将其替换为代码以创建并返回 `JWT`。
+
+由于这些是 `API` 路由，我们将使用常用的 [<font color=red>CURL</font>](https://curl.haxx.se/) 库对其进行测试。您可以使用在 `UsersService` 中硬编码的任何用户对象进行测试。
+
+```bash
+$ # POST to /auth/login
+$ curl -X POST http://localhost:3000/auth/login -d '{"username": "john", "password": "changeme"}' -H "Content-Type: application/json"
+$ # result -> {"userId":1,"username":"john"}
+```
+
+在此过程中，将策略名称直接传递给 `AuthGuard()` 会在代码库中引入魔术字符串。相反，我们建议您创建自己的类，如下所示：
+
+::: tip 官方示例
+    auth/local-auth.guard.ts
+:::
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+@Injectable()
+export class LocalAuthGuard extends AuthGuard('local') {}
+```
+
+现在，我们可以更新 `/auth  /login` 路由处理程序，并改用 `LocalAuthGuard`：
+
+```typescript
+@UseGuards(LocalAuthGuard)
+@Post('auth/login')
+async login(@Request() req) {
+  return req.user;
+}
+```
+
+
+## `JWT` 功能
+
+我们准备继续进行身份验证系统的 `JWT` 部分。让我们回顾并完善我们的要求：
+  - 允许用户使用用户名/密码进行身份验证，返回一个 `JWT`，以便在随后对受保护的 `API` 端点的调用中使用。我们正在努力满足这一要求。要完成它，我们需要编写发出 `JWT` 的代码。
+  - 创建基于有效 `JWT` 作为承载令牌受到保护的 `API` 路由
+
+我们将需要安装更多软件包来支持我们的 `JWT` 要求：
+
+```bash
+$ npm install --save @nestjs/jwt passport-jwt
+$ npm install --save-dev @types/passport-jwt
+```
+
+`@nestjs/jwt` 软件包([请参见此处](https://github.com/nestjs/jwt))是一个实用程序软件包，可帮助进行 `JWT` 操作。`Passport-jwt` 包是实现 `JWT` 策略的 `Passport` 包，`@types/passport-jwt` 提供 `TypeScript` 类型定义。
+
+让我们仔细看看 `POST /auth /login` 请求的处理方式。我们使用 `passport-local` 策略提供的内置 `AuthGuard` 装饰了路线。这意味着：
+  1、仅当用户通过验证后，才会调用路由处理程序
+  2、`req` 参数将包含一个用户属性(在 `passport-local` 认证流程中由 `Passport` 填充)
+
+考虑到这一点，我们现在可以最终生成一个真实的 `JWT`，并以这种方式返回它。为了保持我们的服务干净模块化，我们将在 `authService` 中处理生成 `JWT`。打开`auth` 文件夹中的 `auth.service.ts` 文件，并添加 `login()` 方法，并导入 `JwtService`，如下所示：
+
+::: tip 官方示例
+    auth/auth.service.ts
+:::
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
+import { JwtService } from '@nestjs/jwt';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService
+  ) {}
+
+  async validateUser(username: string, pass: string): Promise<any> {
+    const user = await this.usersService.findOne(username);
+    if (user && user.password === pass) {
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
+  }
+
+  async login(user: any) {
+    const payload = { username: user.username, sub: user.userId };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+}
+```
+
+我们正在使用 `@nestjs/jwt` 库，它提供了 `sign()` 函数来根据用户对象属性的子集生成 `JWT`，然后将其作为具有单个 `access_token` 属性的简单对象返回。注意：我们选择 `sub` 的属性名称来保存我们的 `userId` 值，以与 `JWT` 标准保持一致。不要忘记将 `JwtService` 提供程序注入 `AuthService`。
+
+现在，我们需要更新 `AuthModule` 以导入新的依赖项并配置 `JwtModule`。
+首先，在 `auth` 文件夹中创建 `constants.ts`，并添加以下代码：
+
+::: tip 官方示例
+    auth/constants.ts
+:::
+
+```typescript
+export const jwtConstants = {
+  secret: 'secretKey',
+};
+```
+
+我们将使用它在 `JWT` 签名和验证步骤之间共享密钥。
+
+::: warning
+<font color=red>请勿公开公开此密钥。</font>我们这样做是为了清楚代码在做什么，但是在生产系统中，您必须使用适当的措施(例如，密钥库，环境变量或配置服务)来保护此密钥。
+:::
+
+现在，在 `auth` 文件夹中打开 `auth.module.ts` 并将其更新为如下所示：
+
+::: tip 官方示例
+    auth/auth.module.ts
+:::
+
+```typescript
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { LocalStrategy } from './local.strategy';
+import { UsersModule } from '../users/users.module';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './constants';
+
+@Module({
+  imports: [
+    UsersModule,
+    PassportModule,
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '60s' },
+    }),
+  ],
+  providers: [AuthService, LocalStrategy],
+  exports: [AuthService],
+})
+export class AuthModule {}
+```
+
+我们使用 `register()` 配置 `JwtModule`，并传入配置对象。有关 `Nest JwtModule` 的更多信息，[请参见此处](https://github.com/nestjs/jwt/blob/master/README.md)；有关可用配置选项的更多详细信息，[请参见此处](https://github.com/auth0/node-jsonwebtoken#usage)。
+
+现在，我们可以更新 `/auth  /login` 路由以返回 `JWT`。
+
+::: tip 官方示例
+    app.controller.ts
+:::
+
+```typescript
+import { Controller, Request, Post, UseGuards } from '@nestjs/common';
+import { LocalAuthGuard } from './auth/local-auth.guard';
+import { AuthService } from './auth/auth.service';
+
+@Controller()
+export class AppController {
+  constructor(private authService: AuthService) {}
+
+  @UseGuards(LocalAuthGuard)
+  @Post('auth/login')
+  async login(@Request() req) {
+    return this.authService.login(req.user);
+  }
+}
+```
+
+让我们继续使用 `CURL` 测试我们的路线。您可以使用在 `UsersService` 中硬编码的任何用户对象进行测试。
+
+```bash
+$ # POST to /auth/login
+$ curl -X POST http://localhost:3000/auth/login -d '{"username": "john", "password": "changeme"}' -H "Content-Type: application/json"
+$ # result -> {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."}
+$ # Note: above JWT truncated
+```
+
+## 实施 `Passport JWT`
+
+现在，我们可以满足我们的最终要求：通过要求请求中存在有效的 `JWT` 来保护端点。`Passport` 也可以在这里帮助我们。它提供了用于通过 `JSON Web` 令牌保护 `RESTful` 端点的 `password-jwt` 策略。首先在 `auth` 文件夹中创建一个名为 `jwt.strategy.ts` 的文件，然后添加以下代码：
+
+::: tip 官方示例
+    auth/jwt.strategy.ts
+:::
+
+```typescript
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { PassportStrategy } from '@nestjs/passport';
+import { Injectable } from '@nestjs/common';
+import { jwtConstants } from './constants';
+
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor() {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: jwtConstants.secret,
+    });
+  }
+
+  async validate(payload: any) {
+    return { userId: payload.sub, username: payload.username };
+  }
+}
+```
+
+通过我们的 `JwtStrategy`，我们遵循了前面针对所有 `Passport` 策略所述的相同方法。这种策略需要一些初始化，因此我们通过在 `super()` 调用中传入一个 `options` 对象来实现。您可以在[此处](https://github.com/mikenicholson/passport-jwt#configure-strategy)阅读更多有关可用选项的信息。这些选项是：
+  - `jwtFromRequest`：提供从请求中提取 `JWT` 的方法。我们将使用在 `API` 请求的 `Authorization` 标头中提供承载令牌的标准方法。[此处](https://github.com/mikenicholson/passport-jwt#extracting-the-jwt-from-the-request)介绍了其他选项。
+  - `ignoreExpiration`：为了明确起见，我们选择默认的 `false` 设置，该设置将确保 `JWT` 尚未过期的责任委托给 `Passport` 模块。这意味着，如果我们的路由提供有过期的 `JWT`，则该请求将被拒绝，并发送 `401` 未经授权的响应。`Passport` 会为我们自动方便地处理此问题。
+  - `secretOrKey`：我们正在使用权宜之计，即提供对称加密来对令牌进行签名。其他选项(例如，`PEM` 编码的公共密钥)可能更适合生产应用程序(请参阅[此处](https://github.com/mikenicholson/passport-jwt#extracting-the-jwt-from-the-request)以获取更多信息)。在任何情况下，如前所述，**请勿公开公开此秘密**。
+
+`validate()` 方法值得讨论。对于 `jwt-strategy`，`Passport` 首先验证 `JWT` 的签名并解码 `JSON`。然后，它调用我们的 `validate()` 方法，将解码后的 `JSON` 作为其单个参数传递。根据 `JWT` 签名的工作方式，我们可以确保我们收到的是先前已签名并颁发给有效用户的有效令牌。
+
+所有这些的结果是，我们对 `validate()` 回调的响应是微不足道的：我们仅返回一个包含 `userId` 和 `username` 属性的对象。再次回想一下，`Passport` 将基于 `validate()` 方法的返回值构建一个用户对象，并将其作为属性附加到 `Request` 对象上。
+
+还值得指出的是，这种方法给我们留下了空间("钩子")，将其他业务逻辑注入到流程中。例如，我们可以在 `validate()` 方法中进行数据库查找，以提取有关用户的更多信息，从而在我们的请求中提供更丰富的用户对象。这也是我们可能决定进行进一步令牌验证的地方，例如在已撤销令牌列表中查找 `userId`，从而使我们能够执行令牌注销。在示例代码中，我们在此处实现的模型是快速"无状态 `JWT` "模型，其中，每个 `API` 调用都会根据有效 `JWT` 的存在以及有关请求者的少量信息(其 `userId` 和 `username`)可在我们的请求管道中找到。
+
+在 `AuthModule` 中将新的 `JwtStrategy` 添加为提供者：
+
+::: tip 官方示例
+    auth/auth.module.ts
+:::
+
+```typescript
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { LocalStrategy } from './local.strategy';
+import { JwtStrategy } from './jwt.strategy';
+import { UsersModule } from '../users/users.module';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './constants';
+
+@Module({
+  imports: [
+    UsersModule,
+    PassportModule,
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '60s' },
+    }),
+  ],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
+  exports: [AuthService],
+})
+export class AuthModule {}
+```
+
+通过导入在签署 `JWT` 时使用的相同密钥，确保由 `Passport` 执行的验证阶段和在 `AuthService` 中执行的签署阶段均使用公共密钥。
+
+最后，我们定义 `JwtAuthGuard` 类，该类扩展了内置的 `AuthGuard`：
+
+::: tip 官方示例
+    auth/jwt-auth.guard.ts
+:::
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {}
+```
+
+## 实施受保护的路由和 `JWT` 策略防护
+
+现在，我们可以实现受保护的路由及其关联的 `Guard`。
+
+打开 `app.controller.ts` 文件并如下所示进行更新：
+
+::: tip 官方示例
+    app.controller.ts
+:::
+
+```typescript
+import { Controller, Get, Request, Post, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { LocalAuthGuard } from './auth/local-auth.guard';
+import { AuthService } from './auth/auth.service';
+
+@Controller()
+export class AppController {
+  constructor(private authService: AuthService) {}
+
+  @UseGuards(LocalAuthGuard)
+  @Post('auth/login')
+  async login(@Request() req) {
+    return this.authService.login(req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@Request() req) {
+    return req.user;
+  }
+}
+```
+
+再次，我们将应用配置了 `password-jwt` 模块时 `@nestjs/passport` 模块自动为我们配置的 `AuthGuard`。该 `Guard` 由其默认名称 `jwt` 引用。当我们的 `GET /profile` 路由被命中时，`Guard` 将自动调用我们的 `password-jwt` 定制配置的逻辑，验证 `JWT`，并将 `user` 属性分配给 `Request` 对象。
+
+确保该应用程序正在运行，并使用 `CURL` 测试路由。
+
+```bash
+$ # GET /profile
+$ curl http://localhost:3000/profile
+$ # result -> {"statusCode":401,"error":"Unauthorized"}
+
+$ # POST /auth/login
+$ curl -X POST http://localhost:3000/auth/login -d '{"username": "john", "password": "changeme"}' -H "Content-Type: application/json"
+$ # result -> {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm... }
+
+$ # GET /profile using access_token returned from previous step as bearer code
+$ curl http://localhost:3000/profile -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
+$ # result -> {"userId":1,"username":"john"}
+```
+
+请注意，在 `AuthModule` 中，我们将 `JWT` 配置为具有60秒的到期时间。到期时间可能太短，处理令牌到期和刷新的细节不在本文讨论范围之内。但是，我们选择该方法来证明 `JWT` 的重要质量和 `passport-jwt` 策略。如果您在验证后等待60秒再尝试执行 `GET  /profile` 请求，则会收到401未经授权的响应。这是因为 `Passport` 会自动检查 `JWT` 的到期时间，从而省去了在应用程序中执行此操作的麻烦。
+
+现在，我们已经完成了 `JWT` 身份验证的实现。`JavaScript` 客户端(例如 `Angular/React/Vue`)和其他 `JavaScript` 应用程序现在可以通过我们的 `API` 服务器进行身份验证并进行安全通信。您可以在[此处](https://github.com/nestjs/nest/tree/master/sample/19-auth-jwt)中找到完整的代码版本。
+
+
+## 默认策略
+
+在我们的 `AppController` 中，我们在 `AuthGuard()` 函数中传递策略的名称。我们需要这样做，因为我们已经引入了两种 `Passport` 策略(`passport-local` 和 `passport-jwt`)，这两种策略都提供了各种 `Passport` 组件的实现。传递名称将消除我们要链接到实现的歧义。当应用程序中包含多个策略时，我们可以声明一个默认策略，这样，如果使用该默认策略，就不再需要在 `AuthGuard` 函数中传递名称。这是导入 `PassportModule` 时如何注册默认策略的方法。这段代码将放在 `AuthModule` 中：
+
+```typescript
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { LocalStrategy } from './local.strategy';
+import { UsersModule } from '../users/users.module';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './constants';
+import { JwtStrategy } from './jwt.strategy';
+
+@Module({
+  imports: [
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '60s' },
+    }),
+    UsersModule,
+  ],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
+  exports: [AuthService],
+})
+export class AuthModule {}
+```
+
+
+## 请求范围策略
+
+`passport API` 基于向库的全局实例进行注册的策略。因此，策略的设计不具有依赖于请求的选项，也不是针对每个请求动态实例化的(更多有关[请求范围](https://docs.nestjs.com/fundamentals/injection-scopes)的提供程序的信息)。当您将策略配置为基于请求范围时，`Nest` 将不会实例化该策略，因为它没有绑定到任何特定的路由。没有物理方法可以确定每个请求应执行哪些"请求范围"策略。
+
+但是，有一些方法可以在策略中动态解析请求范围的提供程序。 为此，我们利用[模块参考](https://docs.nestjs.com/fundamentals/module-ref)功能。
+
+首先，打开 `local.strategy.ts` 文件并以常规方式注入 `ModuleRef`：
+
+```typescript
+constructor(private moduleRef: ModuleRef) {
+  super({
+    passReqToCallback: true,
+  });
+}
+```
+
+::: tip
+从 `@nestjs/core` 包中导入 `ModuleRef` 类。
+:::
+
+确保将 `passReqToCallback` 配置属性设置为 `true`，如上所示。
+
+在下一步中，该请求实例将用于获取当前上下文标识符，而不是生成一个新的标识符(在[此处](https://docs.nestjs.com/fundamentals/module-ref#getting-current-sub-tree)了解有关请求上下文的更多信息)。
+
+现在，在 `LocalStrategy` 类的 `validate()` 方法内部，使用 `ContextIdFactory` 类的 `getByRequest()` 方法创建基于请求对象的上下文 `ID`，并将其传递给`resolve()` 调用：
+
+```typescript
+async validate(
+  request: Request,
+  username: string,
+  password: string,
+) {
+  const contextId = ContextIdFactory.getByRequest(request);
+  // "AuthService" is a request-scoped provider
+  const authService = await this.moduleRef.resolve(AuthService, contextId);
+  ...
+}
+```
+
+在上面的示例中，`resolve()` 方法将异步返回 `AuthService` 提供程序的请求范围的实例(我们假设 `AuthService` 被标记为请求范围的提供程序)。
+
+
+## 扩展守卫
+
+在大多数情况下，使用提供的 `AuthGuard` 类就足够了。但是，当您只想扩展默认错误处理或身份验证逻辑时，可能会有用例。为此，您可以扩展内置类并在子类中重写方法。
+
+```typescript
+import {
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  canActivate(context: ExecutionContext) {
+    // Add your custom authentication logic here
+    // for example, call super.logIn(request) to establish a session.
+    return super.canActivate(context);
+  }
+
+  handleRequest(err, user, info) {
+    // You can throw an exception based on either "info" or "err" arguments
+    if (err || !user) {
+      throw err || new UnauthorizedException();
+    }
+    return user;
+  }
+}
+```
+
+
+## 自定义 `Passport`
+
+可以使用 `register()` 方法以相同的方式传递任何标准 `Passport` 定制选项。可用选项取决于所实施的策略。例如：
+
+```typescript
+PassportModule.register({ session: true });
+```
+
+您还可以在其构造函数中向策略传递选项对象以对其进行配置。对于本地策略，您可以通过一下示例：
+
+```typescript
+constructor(private authService: AuthService) {
+  super({
+    usernameField: 'email',
+    passwordField: 'password',
+  });
+}
+```
+
+查看官方 [<font color=red>Passport网站</font>](http://www.passportjs.org/docs/oauth/)上的属性名称。
+
+
+
+## 命名策略
+
+实施策略时，可以通过将第二个参数传递给 `PassportStrategy` 函数来为其提供名称。如果您不这样做，则每个策略都会有一个默认名称(例如，`jwt-strategy` 的名称为 `"jwt"`)：
+
+```typescript
+export class JwtStrategy extends PassportStrategy(Strategy, 'myjwt')
+```
+
+然后，您通过 `@UseGuards(AuthGuard('myjwt'))` 之类的装饰器来引用它。
+
+
+
+## `GraphQL`
+
+为了将 `AuthGuard` 与 [`GraphQL`](https://docs.nestjs.com/graphql/quick-start) 一起使用，请扩展内置的 `AuthGuard` 类并重写 `getRequest()` 方法。
+
+```typescript
+@Injectable()
+export class GqlAuthGuard extends AuthGuard('jwt') {
+  getRequest(context: ExecutionContext) {
+    const ctx = GqlExecutionContext.create(context);
+    return ctx.getContext().req;
+  }
+}
+```
+
+要使用上述构造，请确保将请求 (`req`) 对象作为 `GraphQL Module` 设置中上下文值的一部分传递：
+
+```typescript
+GraphQLModule.forRoot({
+  context: ({ req }) => ({ req }),
+});
+```
+
+要在您的 `graphql` 解析器中获取当前经过身份验证的用户，可以定义一个 `@CurrentUser()` 装饰器：
+
+```typescript
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
+
+export const CurrentUser = createParamDecorator(
+  (data: unknown, context: ExecutionContext) => {
+    const ctx = GqlExecutionContext.create(context);
+    return ctx.getContext().req.user;
+  },
+);
+```
+
+要在解析器中使用上述装饰器，请确保将其作为查询或变异的参数：
+
+```typescript
+@Query(returns => User)
+@UseGuards(GqlAuthGuard)
+whoAmI(@CurrentUser() user: User) {
+  return this.usersService.findById(user.id);
+}
+```
+
