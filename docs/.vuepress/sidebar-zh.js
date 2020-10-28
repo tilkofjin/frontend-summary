@@ -44,6 +44,7 @@ module.exports = {
             ["/zh/guide/nestjs/techniques/mongo", "Mongo"],
             ["/zh/guide/nestjs/techniques/configuration", "配置"],
             ["/zh/guide/nestjs/techniques/validation", "验证"],
+            ["/zh/guide/nestjs/techniques/caching", "缓存"],
           ],
         },
       ],
